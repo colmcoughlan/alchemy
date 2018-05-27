@@ -16,11 +16,11 @@ public class Charity {
     private String number;
     private String description;
 
-    private Map<String,String> keywords = new HashMap<>();
-    private Map<String,String> freqs = new HashMap<>();
+    private Map<String, String> keywords = new HashMap<>();
+    private Map<String, String> freqs = new HashMap<>();
 
 
-    public Charity(String name, String category, String description, String logo_url, String number, Map<String,String> keywords, Map<String,String> freqs) {
+    public Charity(String name, String category, String description, String logo_url, String number, Map<String, String> keywords, Map<String, String> freqs) {
         this.name = name;
         this.category = category;
         this.logo_url = logo_url;
@@ -30,25 +30,25 @@ public class Charity {
         this.description = description;
     }
 
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
-    public String getCategory(){
+    public String getCategory() {
         return this.category;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return this.description;
     }
 
-    public List<String>  getKeys(){
+    public List<String> getKeys() {
         List<String> keys = new ArrayList<String>(keywords.keySet());
 
         return keys;
     }
 
-    public Map<String,String> getFreqs(){
+    public Map<String, String> getFreqs() {
         return freqs;
     }
 
@@ -56,36 +56,35 @@ public class Charity {
         return keywords.get(key);
     }
 
-    public CharSequence[] getKeywords(List<String> keys){
+    public CharSequence[] getKeywords(List<String> keys) {
 
         List<String> keys_values = new ArrayList<String>();
 
-        for(int i = 0; i< keys.size();i++){
+        for (int i = 0; i < keys.size(); i++) {
             keys_values.add(getKeywordDescription(freqs.get(keys.get(i))) + ": " + keys.get(i) + " - " + keywords.get(keys.get(i)));
         }
 
         return keys_values.toArray(new CharSequence[keys_values.size()]);
     }
 
-    public String getLogoURL(){
+    public String getLogoURL() {
         return this.logo_url;
     }
 
-    public String getNumber(){
+    public String getNumber() {
         return this.number;
     }
 
     // get keyword text
 
-    private String getKeywordDescription(String freq){
-        if(freq.equals("once")){
+    private String getKeywordDescription(String freq) {
+        if (freq.equals("once")) {
             return "One time donation";
-        } else if (freq.equals("week")){
+        } else if (freq.equals("week")) {
             return "Weekly donation";
-        } else if (freq.equals("month")){
+        } else if (freq.equals("month")) {
             return "Monthly donation";
-        }
-        else{
+        } else {
             return "Error! Please report this if you see it.";
         }
     }

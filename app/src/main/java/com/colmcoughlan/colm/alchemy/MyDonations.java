@@ -3,14 +3,9 @@ package com.colmcoughlan.colm.alchemy;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.GridView;
 
 import java.util.HashMap;
@@ -35,7 +30,7 @@ public class MyDonations extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_donations);
         setupActionBar();
-        Map<String,Integer> donations = get_donations();
+        Map<String, Integer> donations = get_donations();
 
         gridView = (GridView) findViewById(R.id.my_donations_gridview);
         gridView.setAdapter(new DonationsAdapter(this, donations));
@@ -50,12 +45,12 @@ public class MyDonations extends AppCompatActivity {
         }
     }
 
-    private Map<String, Integer> get_donations(){
+    private Map<String, Integer> get_donations() {
 
 
         Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), null, "address='50300'", null, null);
 
-        Map<String,Integer> donations = new HashMap<String, Integer>();
+        Map<String, Integer> donations = new HashMap<String, Integer>();
 
         Integer totalDonations = 0;
 
@@ -63,12 +58,11 @@ public class MyDonations extends AppCompatActivity {
             do {
 
                 //Log.d("New message", "msg");
-                for(int idx=0;idx<cursor.getColumnCount();idx++)
-                {
-                    if(cursor.getColumnName(idx).contentEquals("body")){
+                for (int idx = 0; idx < cursor.getColumnCount(); idx++) {
+                    if (cursor.getColumnName(idx).contentEquals("body")) {
                         String msgData = cursor.getString(idx);
 
-                        if(msgData.startsWith("Thank you")){
+                        if (msgData.startsWith("Thank you")) {
                             try {
                                 String charity_name = (msgData.split(" to ")[1]).split("\\.")[0];
                                 String[] amountString = msgData.split(" Euro")[0].split(" ");
