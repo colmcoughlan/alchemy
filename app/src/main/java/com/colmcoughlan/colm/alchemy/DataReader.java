@@ -42,18 +42,18 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
 
     protected List<Charity> doInBackground(String... urlString) {
 
-        List<String> categories = new ArrayList<String>();
+        List<String> categories = new ArrayList<>();
 
-        BufferedReader reader = null;
+        BufferedReader reader;
         HttpsURLConnection urlConnection = null;
-        List<Charity> charityList = new ArrayList<Charity>();
+        List<Charity> charityList = new ArrayList<>();
 
         try {
             URL url = new URL(urlString[0]);
             urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept-Encoding", "gzip"); // ask for json to be compressed
 
-            InputStream in = null;
+            InputStream in;
             if ("gzip".equals(urlConnection.getContentEncoding())) { // support compression if present
                 in = new BufferedInputStream(new GZIPInputStream(urlConnection.getInputStream()));
             } else {
@@ -61,7 +61,7 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
             }
             reader = new BufferedReader(new InputStreamReader(in));
             StringBuffer buffer = new StringBuffer();
-            String line = "";
+            String line;
 
             while ((line = reader.readLine()) != null) {
                 buffer.append(line + "\n");
