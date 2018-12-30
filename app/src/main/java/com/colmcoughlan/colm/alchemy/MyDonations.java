@@ -47,16 +47,8 @@ public class MyDonations extends AppCompatActivity {
             public void onChanged(@Nullable final List<Donation> donations) {
                 if (donations.isEmpty()) {
                     Map<String, Integer> smsDonations = getSmsDonations();
-                    for (String charity : smsDonations.keySet()) {
-                        boolean insert = true;
-                        for (Donation donation : donations) {
-                            if (donation.getCharityName().equals(charity)) {
-                                insert = false;
-                            }
-                        }
-                        if (insert) {
-                            donationViewModel.insertNewDonation(charity, smsDonations.get(charity));
-                        }
+                    if(!smsDonations.isEmpty()){
+                        donationViewModel.insertMap(smsDonations);
                     }
                 }
 

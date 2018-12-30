@@ -25,16 +25,35 @@ public class DonationRepository {
         allDonations = donationDao.getAllDonations();
     }
 
-    public LiveData<List<Donation>> getAllDonations(){
+    public LiveData<List<Donation>> getAllDonations() {
         return allDonations;
     }
 
-    public void insertDonation(Donation donation){
+    public void insertDonation(Donation donation) {
         new insertAsyncDonation(donationDao).execute(donation);
     }
 
-    public void updateDonation(Donation donation){
+    public void insertAll(List<Donation> donations) {
+        new insertAsyncDonations(donationDao).execute(donations);
+    }
+
+    public void updateDonation(Donation donation) {
         new updateAsyncDonation(donationDao).execute(donation);
+    }
+
+    private static class insertAsyncDonations extends AsyncTask<List<Donation>, Void, Void> {
+
+        private DonationDao mAsyncDonationDao;
+
+        insertAsyncDonations(DonationDao dao) {
+            mAsyncDonationDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final List<Donation>... params) {
+            mAsyncDonationDao.insertAll(params[0]);
+            return null;
+        }
     }
 
     private static class insertAsyncDonation extends AsyncTask<Donation, Void, Void> {
