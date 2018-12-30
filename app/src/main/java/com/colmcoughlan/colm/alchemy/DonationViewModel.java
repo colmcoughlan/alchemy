@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 import com.colmcoughlan.colm.alchemy.model.Donation;
 import com.colmcoughlan.colm.alchemy.repository.DonationRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by colmc on 30/12/2018.
@@ -26,7 +28,7 @@ public class DonationViewModel extends AndroidViewModel {
         return donationRepository.getAllDonations();
     }
 
-    public void insertNewDonation(String charity, double value) {
+    private void insertNewDonation(String charity, double value) {
         final long timestamp = System.currentTimeMillis();
 
         Donation donation = new Donation();
@@ -37,6 +39,24 @@ public class DonationViewModel extends AndroidViewModel {
         donation.setLastDonationTimestamp(timestamp);
 
         donationRepository.insertDonation(donation);
+    }
+
+    public void insertMap(Map<String, Integer> map) {
+        final long timestamp = System.currentTimeMillis();
+        List<Donation> donations = new ArrayList<>(map.size());
+
+        for (String charity : map.keySet()) {
+            Donation donation = new Donation();
+            donation.setCharityName(charity);
+            donation.setTotalDonation(map.get(charity));
+            donation.setNumberOfDonations(1);
+            donation.setFirstDonationTimestamp(timestamp);
+            donation.setLastDonationTimestamp(timestamp);
+
+            donations.add(donation);
+        }
+
+        donationRepository.insertAll(donations);
     }
 
     public void recordDonation(List<Donation> donations, final String charity, final double value) {

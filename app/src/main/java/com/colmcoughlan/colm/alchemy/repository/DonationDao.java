@@ -19,6 +19,9 @@ public interface DonationDao {
     @Insert
     void insertDonation(Donation donation);
 
+    @Insert
+    void insertAll(List<Donation> donation);
+
     @Update
     void updateDonation(Donation donation);
 
