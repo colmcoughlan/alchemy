@@ -25,8 +25,7 @@ public class ImageAdapter extends BaseAdapter {
     private List<Charity> filteredList;
     private CharityFilter charityFilter;
 
-    static class ViewHolder
-    {
+    static class ViewHolder {
         TextView textView;
         ImageView imageView;
     }
@@ -66,19 +65,17 @@ public class ImageAdapter extends BaseAdapter {
             Picasso.get().cancelRequest(holder.imageView);
         }
 
-        if (position % 2 == 0){
+        if (position % 2 == 0) {
             convertView.setBackgroundColor(Color.parseColor("#e0e0e0"));
-        }
-        else {
+        } else {
             convertView.setBackgroundColor(Color.parseColor("#eeeeee"));
         }
 
         holder.textView.setText(filteredList.get(position).getName());
         String logo_url = filteredList.get(position).getLogoURL();
-        try{
+        try {
             Picasso.get().load(logo_url).placeholder(R.drawable.alchemy).into(holder.imageView);
-        }
-        catch (Throwable e){
+        } catch (Throwable e) {
             Picasso.get().load(R.drawable.alchemy).into(holder.imageView);
         }
 
@@ -97,7 +94,7 @@ public class ImageAdapter extends BaseAdapter {
     private class CharityFilter extends Filter {
 
         @Override
-        protected FilterResults performFiltering(CharSequence constraintCategory){
+        protected FilterResults performFiltering(CharSequence constraintCategory) {
             FilterResults filterResults = new FilterResults();
             String[] parts = constraintCategory.toString().split(":cat:");
             CharSequence constraint = parts[0];
@@ -106,26 +103,26 @@ public class ImageAdapter extends BaseAdapter {
             boolean matchesConstraint = false;
             boolean matchesCategory = false;
 
-            if (constraint!=null && constraint.length()>0){
+            if (constraint != null && constraint.length() > 0) {
                 haveConstraint = true;
             }
             if (haveConstraint || !category.equals("All")) {
                 ArrayList<Charity> tempList = new ArrayList<Charity>();
 
                 for (Charity charity : charityList) {
-                    if(haveConstraint){
+                    if (haveConstraint) {
                         matchesConstraint = (charity.getName().toLowerCase().contains(constraint.toString().toLowerCase()));
-                    }else{
+                    } else {
                         matchesConstraint = true;
                     }
 
-                    if(category.equals("All")){
+                    if (category.equals("All")) {
                         matchesCategory = true;
-                    }else{
+                    } else {
                         matchesCategory = (charity.getCategory().toLowerCase().contains(category.toString().toLowerCase()));
                     }
 
-                    if  (matchesConstraint && matchesCategory) {
+                    if (matchesConstraint && matchesCategory) {
                         tempList.add(charity);
                     }
                 }

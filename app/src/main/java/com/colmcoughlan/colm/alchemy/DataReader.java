@@ -3,7 +3,6 @@ package com.colmcoughlan.colm.alchemy;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Adapter;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -15,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import javax.net.ssl.HttpsURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 /**
@@ -42,30 +42,29 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
 
     protected List<Charity> doInBackground(String... urlString) {
 
-        List<String> categories = new ArrayList<String>();
+        List<String> categories = new ArrayList<>();
 
-        BufferedReader reader = null;
+        BufferedReader reader;
         HttpsURLConnection urlConnection = null;
-        List<Charity> charityList = new ArrayList<Charity>();
+        List<Charity> charityList = new ArrayList<>();
 
         try {
             URL url = new URL(urlString[0]);
             urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept-Encoding", "gzip"); // ask for json to be compressed
 
-            InputStream in = null;
+            InputStream in;
             if ("gzip".equals(urlConnection.getContentEncoding())) { // support compression if present
                 in = new BufferedInputStream(new GZIPInputStream(urlConnection.getInputStream()));
-            }
-            else{
+            } else {
                 in = new BufferedInputStream(urlConnection.getInputStream());
             }
             reader = new BufferedReader(new InputStreamReader(in));
             StringBuffer buffer = new StringBuffer();
-            String line = "";
+            String line;
 
             while ((line = reader.readLine()) != null) {
-                buffer.append(line+"\n");
+                buffer.append(line + "\n");
                 //Log.d("Response: ", "> " + line);
             }
             String result = buffer.toString();
@@ -73,18 +72,18 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
             JSONObject payload = new JSONObject(result);
 
             // first get the categories
-            JSONArray categories_list  = payload.getJSONArray("categories");
-            for(int i = 0;i< categories_list.length();i++){
-                categories.add( categories_list.getString(i));
+            JSONArray categories_list = payload.getJSONArray("categories");
+            for (int i = 0; i < categories_list.length(); i++) {
+                categories.add(categories_list.getString(i));
             }
 
             // now get the charities
             JSONObject charities = payload.getJSONObject("charities");
             Iterator<?> keys = charities.keys();
             // for each charity
-            while( keys.hasNext() ) {
-                String key = (String)keys.next(); // get the charity name
-                if ( charities.get(key) instanceof JSONObject ) {
+            while (keys.hasNext()) {
+                String key = (String) keys.next(); // get the charity name
+                if (charities.get(key) instanceof JSONObject) {
                     //Log.d("Response: ", "> " + key);
                     String category = ((JSONObject) charities.get(key)).getString("category"); // category
                     String link = ((JSONObject) charities.get(key)).getString("logo_url"); // logo link
@@ -92,20 +91,20 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
                     String number = ((JSONObject) charities.get(key)).getString("number"); // lphone number
 
 
-                    Map<String,String> donation_keys_strings = new HashMap<String, String>();
-                    Map<String,String> frequency_keys_strings = new HashMap<String, String>();
+                    Map<String, String> donation_keys_strings = new HashMap<String, String>();
+                    Map<String, String> frequency_keys_strings = new HashMap<String, String>();
 
                     JSONObject donation_list = new JSONObject(((JSONObject) charities.get(key)).getString("donation_options")); // get the donation options
                     Iterator<?> donation_keys = donation_list.keys();
-                    while( donation_keys.hasNext() ) {
-                        String donation_key = (String)donation_keys.next(); // donation keys and values
+                    while (donation_keys.hasNext()) {
+                        String donation_key = (String) donation_keys.next(); // donation keys and values
                         donation_keys_strings.put(donation_key, donation_list.getString(donation_key));
                     }
 
                     JSONObject freq_list = new JSONObject(((JSONObject) charities.get(key)).getString("freq")); // get the frequencies
                     Iterator<?> freq_keys = freq_list.keys();
-                    while( freq_keys.hasNext() ) {
-                        String freq_key = (String)freq_keys.next(); // donation keys and values
+                    while (freq_keys.hasNext()) {
+                        String freq_key = (String) freq_keys.next(); // donation keys and values
                         frequency_keys_strings.put(freq_key, freq_list.getString(freq_key));
                     }
 

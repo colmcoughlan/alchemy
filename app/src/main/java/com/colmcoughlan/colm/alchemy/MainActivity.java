@@ -3,20 +3,22 @@ package com.colmcoughlan.colm.alchemy;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,13 +30,15 @@ import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.colmcoughlan.colm.alchemy.model.Donation;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.READ_SMS;
-import static android.Manifest.permission.SEND_SMS;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private GridView gridView = null;
     Activity mainActivity = this;
     private Menu menu;
+    private DonationViewModel donationViewModel;
+    private List<Donation> donations = Collections.EMPTY_LIST;
 
     // add the search and about sections to the menu. Hook up the search option to the correct searchview
 
@@ -134,17 +140,22 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.donationViewModel = ViewModelProviders.of(this).get(DonationViewModel.class);
+
+        // set up observer for donations
+        final Observer<List<Donation>> observer = new Observer<List<Donation>>() {
+            @Override
+            public void onChanged(@Nullable final List<Donation> updatedDonations) {
+                donations = updatedDonations;
+            }
+        };
+        donationViewModel.getAllDonations().observe(this, observer);
 
         // if this is the first run, display an information box
 
         if (firstRun()) {
             showHelp(this);
-        } else {
-            // whether it's first run or not, we need SMS permissions (not granted by default)
-            requestPermissionIfNotGranted(SEND_SMS);
-            requestPermissionIfNotGranted(READ_SMS);
         }
-
 
         // create the gridview and get the data
 
@@ -238,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                ActivityCompat.requestPermissions(activity, new String[]{SEND_SMS, READ_SMS}, 0);
+                ActivityCompat.requestPermissions(activity, new String[]{READ_SMS}, 0);
             }
         });
         AlertDialog dialog = builder.create();
@@ -306,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.setMessage(getString(R.string.likecharity_tcs));
         builder.setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                sendSms(charity.getNumber(), keyword);
+                sendSms(charity, keyword);
                 dialog.dismiss();
             }
         });
@@ -322,39 +333,20 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     // actually send the text
 
-    private void sendSms(String phoneNumber, String message) {
-        SmsManager smsManager = SmsManager.getDefault();
-        try {
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-            Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
-        } catch (SecurityException e) {
-            // some devices need the READ_PHONE_STATE permission to send messages: https://stackoverflow.com/a/49415928
-            if (e.getMessage().contains("READ_PHONE_STATE")) {
-                showBugExplanationDialog();
-            }
+    private void sendSms(Charity charity, String keyword) {
+        Uri uri = Uri.parse("smsto:" + charity.getNumber());
+        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+        intent.setType("text/plain");
+        intent.putExtra("sms_body", keyword);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
         }
+        donationViewModel.recordDonation(this.donations, charity.getName(), smsKeywordToDonation(charity.getCost(keyword)));
+        Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
     }
 
-    private void showBugExplanationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("")
-                .setMessage(R.string.permission_bug_error)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        requestPermissionIfNotGranted(READ_PHONE_STATE);
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
-    }
-
-    private void requestPermissionIfNotGranted(String permission) {
-        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{permission}, 0);
-        }
+    private static Integer smsKeywordToDonation(final String keyword) {
+        String amountString = keyword.split("€")[1];
+        return Integer.parseInt(amountString);
     }
 }

@@ -24,7 +24,7 @@
 
     <string name="confirm_yes">Yes</string>
 
-    <string name="likecharity_tcs">"Texts cost €2, €4 or €6. Charities receive a minimum of €1.63 of €2, €3.25 of €4 and €4.88 of €6. Service Provider: LIKECHARITY. Helpline: 0766805278. If you chose a weekly or monthly donation you can cancel it by texting STOP to 50300."</string>
+    <string name="likecharity_tcs">"Texts cost €2, €4 or €6. Charities receive a minimum of  €1.80 of €2, €3.60 of €4 and €5.40 of €6. Service Provider: LIKECHARITY. Helpline: 0766805278. If you chose a weekly or monthly donation you can cancel it by texting STOP to 50300."</string>
     <string name="toast_confirmation">Donation sent. A confirmation SMS should arrive shortly.</string>
     <string name="toast_recurring_confirmation">Setting up recurring donation. An SMS will arrive shortly requesting confirmation and providing further information.</string>
     <string name="permission_bug_error">Alchemy ran into an bug that some devices have.
@@ -45,14 +45,16 @@
     <string name="welcome_dismiss">Ok</string>
 
     <string name="about_summary">
-        Alchemy collects charity donation phone numbers and presents them  to help you find causes you\'re interested in.
+        Alchemy collects charity donation phone numbers and presents them  to help you find causes that interest you.
         \n\nThe charity information is sourced from <a href="https://api.likecharity.com/charities/">https://api.likecharity.com/charities/</a>.
          All donations are processed by <a href="https://www.likecharity.com">LikeCharity</a>, who have no association whatsoever with this app.
+        \n\nAlchemy is open source and contributions are welcome (see developer website for more details).
         \n\nCurrently Alchemy is restricted to use in Ireland.
     </string>
 
     <string name="disclaimer">Donations made through this app come out of your credit/bill.
         \n\nAlchemy does not handle any of your money - it is sent straight to the listed donation number for the charity.
+        \n\nAlchemy does not collect any of your data, other than the small amount that may be collected in crash logs etc. The actual service provider (LikeCharity) may collect the text data sent to them when making a donation.
         \n\nAlchemy has no association with any of the charities, donation service providers or phone networks that handle your donation.
     </string>
 

@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,9 +26,9 @@ public class DonationsAdapter extends BaseAdapter {
     private static <K, V extends Comparable<? super V>> ArrayList<K>
     sortKeysByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort( list, new Comparator<Map.Entry<K, V>>() {
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
             public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o2.getValue()).compareTo( o1.getValue() );
+                return (o2.getValue()).compareTo(o1.getValue());
             }
         });
 
@@ -66,8 +65,7 @@ public class DonationsAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.my_donations_layout, null);
-            textView = new TextView(mContext);
-            textView = (TextView) convertView.findViewById(R.id.my_donations_gridview_text);
+            textView = convertView.findViewById(R.id.my_donations_gridview_text);
             convertView.setTag(textView);
         } else {
             textView = (TextView) convertView.getTag();
