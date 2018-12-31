@@ -24,7 +24,7 @@
 
     <string name="confirm_yes">Yes</string>
 
-    <string name="likecharity_tcs">"Texts cost €2, €4 or €6. Charities receive a minimum of  €1.80 of €2, €3.60 of €4 and €5.40 of €6. Service Provider: LIKECHARITY. Helpline: 0766805278. If you chose a weekly or monthly donation you can cancel it by texting STOP to 50300."</string>
+    <string name="likecharity_tcs">"Due to recent changes in Google's terms and conditions, Alchemy can no longer automatically send an SMS for you. You will now be taken to your default SMS app - just hit send to perform the donation. You can then use the back button on your phone to return to Alchemy.\n\nTexts cost €2, €4 or €6. Charities receive a minimum of  €1.80 of €2, €3.60 of €4 and €5.40 of €6. Service Provider: LIKECHARITY. Helpline: 0766805278. If you chose a weekly or monthly donation you can cancel it by texting STOP to 50300."</string>
     <string name="toast_confirmation">Donation sent. A confirmation SMS should arrive shortly.</string>
     <string name="toast_recurring_confirmation">Setting up recurring donation. An SMS will arrive shortly requesting confirmation and providing further information.</string>
     <string name="permission_bug_error">Alchemy ran into an bug that some devices have.
