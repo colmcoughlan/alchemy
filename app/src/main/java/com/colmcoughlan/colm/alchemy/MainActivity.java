@@ -13,12 +13,14 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -336,13 +338,33 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private void sendSms(Charity charity, String keyword) {
         Uri uri = Uri.parse("smsto:" + charity.getNumber());
         Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-        intent.setType("text/plain");
+        intent.setData(uri);
+        intent.putExtra("address", charity.getNumber());
         intent.putExtra("sms_body", keyword);
+        intent.putExtra("exit_on_sent", true);
         if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
+            startActivityForResult(intent, 1);
+            donationViewModel.recordDonation(this.donations, charity.getName(), smsKeywordToDonation(charity.getCost(keyword)));
+        } else {
+            Toast.makeText(this, "No SMS provider found", Toast.LENGTH_SHORT).show();
         }
-        donationViewModel.recordDonation(this.donations, charity.getName(), smsKeywordToDonation(charity.getCost(keyword)));
-        Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            switch (resultCode){
+                case Activity.RESULT_OK:
+                    Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
+                    break;
+                case Activity.RESULT_CANCELED: // unfortunately returned by default android sms app at the moment
+                    Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                Toast.makeText(this, "Error sending text", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private static Integer smsKeywordToDonation(final String keyword) {
