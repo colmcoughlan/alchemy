@@ -3,8 +3,6 @@ package com.colmcoughlan.colm.alchemy;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -20,9 +18,6 @@ import java.util.Map;
 
 public class MyDonations extends AppCompatActivity {
 
-    GridView gridView = null;
-    private DonationViewModel donationViewModel;
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -37,7 +32,7 @@ public class MyDonations extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         final Context context = this;
         super.onCreate(savedInstanceState);
-        this.donationViewModel = ViewModelProviders.of(this).get(DonationViewModel.class);
+        final DonationViewModel donationViewModel = ViewModelProviders.of(this).get(DonationViewModel.class);
 
         setContentView(R.layout.activity_my_donations);
         setupActionBar();
@@ -45,14 +40,7 @@ public class MyDonations extends AppCompatActivity {
         final Observer<List<Donation>> observer = new Observer<List<Donation>>() {
             @Override
             public void onChanged(@Nullable final List<Donation> donations) {
-                if (donations.isEmpty()) {
-                    Map<String, Integer> smsDonations = getSmsDonations();
-                    if(!smsDonations.isEmpty()){
-                        donationViewModel.insertMap(smsDonations);
-                    }
-                }
-
-                gridView = findViewById(R.id.my_donations_gridview);
+                GridView gridView = findViewById(R.id.my_donations_gridview);
                 gridView.setAdapter(new DonationsAdapter(context, getMap(donations)));
             }
         };
@@ -81,44 +69,4 @@ public class MyDonations extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
-    private Map<String, Integer> getSmsDonations() {
-
-
-        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), null, "address='50300'", null, null);
-
-        Map<String, Integer> donations = new HashMap<>();
-
-        if (cursor.moveToFirst()) { // must check the result to prevent exception
-            do {
-
-                //Log.d("New message", "msg");
-                for (int idx = 0; idx < cursor.getColumnCount(); idx++) {
-                    if (cursor.getColumnName(idx).contentEquals("body")) {
-                        String msgData = cursor.getString(idx);
-
-                        if (msgData.startsWith("Thank you")) {
-                            try {
-                                String charity_name = (msgData.split(" to ")[1]).split("\\.")[0];
-                                String[] amountString = msgData.split(" Euro")[0].split(" ");
-                                Integer donation_amount = Integer.parseInt(amountString[amountString.length - 1]);
-                                //Log.d("charity_name", charity_name);
-                                //Log.d("donation_amount", donation_amount.toString());
-                                if (donations.containsKey(charity_name)) {
-                                    donations.put(charity_name, donations.get(charity_name) + donation_amount);
-                                } else {
-                                    donations.put(charity_name, donation_amount);
-                                }
-                            } catch (IndexOutOfBoundsException e) {
-                                donations.put("Error!", 1);
-                            }
-                        }
-                    }
-                }
-            } while (cursor.moveToNext());
-        }
-
-        return donations;
-    }
-
 }
