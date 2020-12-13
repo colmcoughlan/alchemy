@@ -16,8 +16,8 @@ public class Charity {
     private String number;
     private String description;
 
-    private Map<String, String> keywords = new HashMap<>();
-    private Map<String, String> freqs = new HashMap<>();
+    private Map<String, String> keywords;
+    private Map<String, String> freqs;
 
 
     public Charity(String name, String category, String description, String logo_url, String number, Map<String, String> keywords, Map<String, String> freqs) {
@@ -43,9 +43,7 @@ public class Charity {
     }
 
     public List<String> getKeys() {
-        List<String> keys = new ArrayList<String>(keywords.keySet());
-
-        return keys;
+        return new ArrayList<String>(keywords.keySet());
     }
 
     public Map<String, String> getFreqs() {

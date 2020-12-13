@@ -2,7 +2,8 @@ package com.colmcoughlan.colm.alchemy;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by colmc on 22/08/2017.

@@ -3,8 +3,6 @@ package com.colmcoughlan.colm.alchemy;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,9 +10,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,13 +27,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     static String category = "All";
     private GridView gridView = null;
     private Menu menu;
     private DonationViewModel donationViewModel;
-    private List<Donation> donations = Collections.EMPTY_LIST;
+    private List<Donation> donations = Collections.emptyList();
 
     // create the main screen
 
@@ -302,13 +303,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         if (requestCode == 1) {
             switch (resultCode) {
                 case Activity.RESULT_OK:
-                    Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
-                    break;
                 case Activity.RESULT_CANCELED: // unfortunately returned by default android sms app at the moment
                     Toast.makeText(this, R.string.toast_confirmation, Toast.LENGTH_SHORT).show();
                     break;
                 default:
-                    Toast.makeText(this, "Error sending text", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_error, Toast.LENGTH_SHORT).show();
             }
         }
     }

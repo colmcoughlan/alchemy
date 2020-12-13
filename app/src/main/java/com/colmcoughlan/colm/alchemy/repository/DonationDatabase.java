@@ -1,9 +1,9 @@
 package com.colmcoughlan.colm.alchemy.repository;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
-
 import com.colmcoughlan.colm.alchemy.model.Donation;
+
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
 
 /**
  * Created by colmc on 30/12/2018.

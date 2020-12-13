@@ -1,8 +1,9 @@
 package com.colmcoughlan.colm.alchemy.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by colmc on 30/12/2018.
@@ -10,7 +11,8 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class Donation {
-    @PrimaryKey @NonNull
+    @PrimaryKey
+    @NonNull
     private String charityName;
     private double totalDonation;
     private long numberOfDonations;

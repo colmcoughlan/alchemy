@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.GridView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,6 +31,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> {
 
+    private static final String LOGO_URL_STR = "logo_url";
+    private static final String DESCRIPTION_STR = "description";
+
     private Context context;
     private GridView t;
 
@@ -42,8 +44,6 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
 
     protected List<Charity> doInBackground(String... urlString) {
 
-        List<String> categories = new ArrayList<>();
-
         BufferedReader reader;
         HttpsURLConnection urlConnection = null;
         List<Charity> charityList = new ArrayList<>();
@@ -51,6 +51,7 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
         try {
             URL url = new URL(urlString[0]);
             urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("client-id", "alchemy");
             urlConnection.setRequestProperty("Accept-Encoding", "gzip"); // ask for json to be compressed
 
             InputStream in;
@@ -60,22 +61,20 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
                 in = new BufferedInputStream(urlConnection.getInputStream());
             }
             reader = new BufferedReader(new InputStreamReader(in));
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             String line;
 
             while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
+                buffer.append(line).append("\n");
                 //Log.d("Response: ", "> " + line);
             }
             String result = buffer.toString();
 
             JSONObject payload = new JSONObject(result);
 
-            // first get the categories
-            JSONArray categories_list = payload.getJSONArray("categories");
-            for (int i = 0; i < categories_list.length(); i++) {
-                categories.add(categories_list.getString(i));
-            }
+            // get the number
+            final String number = payload.getJSONObject("config")
+                    .getString("number"); // phone number
 
             // now get the charities
             JSONObject charities = payload.getJSONObject("charities");
@@ -84,24 +83,22 @@ public class DataReader extends AsyncTask<String, List<Charity>, List<Charity>> 
             while (keys.hasNext()) {
                 String key = (String) keys.next(); // get the charity name
                 if (charities.get(key) instanceof JSONObject) {
-                    //Log.d("Response: ", "> " + key);
-                    String category = ((JSONObject) charities.get(key)).getString("category"); // category
-                    String link = ((JSONObject) charities.get(key)).getString("logo_url"); // logo link
-                    String description = ((JSONObject) charities.get(key)).getString("description"); // description link
-                    String number = ((JSONObject) charities.get(key)).getString("number"); // lphone number
-
+                    JSONObject charity = ((JSONObject) charities.get(key));
+                    String category = charity.getString("category"); // category
+                    String link = charity.has(LOGO_URL_STR) ? charity.getString(LOGO_URL_STR) : ""; // logo link
+                    String description = charity.has(DESCRIPTION_STR) ? charity.getString(DESCRIPTION_STR) : ""; // description link
 
                     Map<String, String> donation_keys_strings = new HashMap<String, String>();
                     Map<String, String> frequency_keys_strings = new HashMap<String, String>();
 
-                    JSONObject donation_list = new JSONObject(((JSONObject) charities.get(key)).getString("donation_options")); // get the donation options
+                    JSONObject donation_list = new JSONObject(charity.getString("donation_options")); // get the donation options
                     Iterator<?> donation_keys = donation_list.keys();
                     while (donation_keys.hasNext()) {
                         String donation_key = (String) donation_keys.next(); // donation keys and values
                         donation_keys_strings.put(donation_key, donation_list.getString(donation_key));
                     }
 
-                    JSONObject freq_list = new JSONObject(((JSONObject) charities.get(key)).getString("freq")); // get the frequencies
+                    JSONObject freq_list = new JSONObject(charity.getString("freq")); // get the frequencies
                     Iterator<?> freq_keys = freq_list.keys();
                     while (freq_keys.hasNext()) {
                         String freq_key = (String) freq_keys.next(); // donation keys and values
