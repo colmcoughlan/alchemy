@@ -11,7 +11,7 @@
         android:roundIcon="@drawable/alchemy_white"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" />
+        <activity android:name=".CharityActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -26,6 +26,13 @@
         <activity
             android:name=".MyDonations"
             android:label="@string/title_activity_my_donations">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CategoryActivity"
+            android:label="@string/title_activity_category">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>

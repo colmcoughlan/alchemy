@@ -16,9 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.colmcoughlan.colm.alchemy.model.Donation;
@@ -28,14 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class CharityActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    static String category = "All";
     private GridView gridView = null;
     private Menu menu;
     private DonationViewModel donationViewModel;
@@ -46,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_charities);
+        setupActionBar();
         this.donationViewModel = ViewModelProviders.of(this).get(DonationViewModel.class);
 
         // set up observer for donations
@@ -67,38 +66,42 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // create the gridview and get the data
 
         gridView = findViewById(R.id.gridview);
-        DataReader dataReader = new DataReader(this, gridView);
-        dataReader.execute(getString(R.string.server_url));
-
-        // create the category spinner
-
-        Spinner spinner = findViewById(R.id.category_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.categories_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // Specify the layout to use when the list of choices appears
-        spinner.setAdapter(adapter); // Apply the adapter to the spinner
-        spinner.setSelection(0, false); // need this to stop OnItemSelectedListener being called at start
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                              @Override
-                                              public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                                  category = (String) parent.getItemAtPosition(position);
-                                                  if (gridView != null) {
-                                                      ImageAdapter imageAdapter = (ImageAdapter) gridView.getAdapter();
-                                                      if (imageAdapter != null) {
-                                                          imageAdapter.getFilter().filter("" + ":cat:" + category);
-                                                      }
-                                                  }
-                                              }
-
-                                              @Override
-                                              public void onNothingSelected(AdapterView<?> parent) {
-                                                  category = "All";
-                                              }
-                                          }
-        );
+        DataReader.executeAsync(getString(R.string.server_url), callback());
 
         // set up click listener for selection of charities
+        gridView.setOnItemClickListener(createOnClickListener());
+        gridView.setOnItemLongClickListener(createOnLongClickListener());
+    }
 
-        gridView.setOnItemClickListener(new OnItemClickListener() {
+    private DataReader.Callback callback(){
+        final Context context = this;
+        return new DataReader.Callback() {
+            @Override
+            public void onComplete() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        View progressBarGroup = findViewById(R.id.indeterminateBar);
+                        progressBarGroup.setVisibility(View.GONE);
+                        ImageAdapter imageAdapter = new ImageAdapter(context, StaticState.getCharities());
+                        imageAdapter.getFilter().filter("" + ":cat:" + StaticState.getCategory());
+                        gridView.setAdapter(imageAdapter);
+                    }
+                });
+            }
+        };
+    }
+
+    private void setupActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Show the Up button in the action bar.
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private OnItemClickListener createOnClickListener() {
+        return new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 final List<String> keywords = charity.getKeys();
                 final Map<String, String> freqs = charity.getFreqs();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(CharityActivity.this);
                 builder.setTitle("Choose a keyword.");
                 builder.setItems(charity.getKeywords(keywords), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -115,9 +118,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 });
                 builder.create().show();
             }
-        });
+        };
+    }
 
-        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    private AdapterView.OnItemLongClickListener createOnLongClickListener() {
+        return new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final Charity charity = (Charity) gridView.getItemAtPosition(position);
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 toast.show();
                 return true; // cancel the single click with true
             }
-        });
+        };
     }
 
     // add the search and about sections to the menu. Hook up the search option to the correct searchview
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         menu.clear();
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.charity_menu, menu);
 
         SearchManager searchManager = (SearchManager)
                 getSystemService(Context.SEARCH_SERVICE);
@@ -171,14 +176,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public boolean onOptionsItemSelected(MenuItem item) {
         menu.findItem(R.id.search).collapseActionView();
         switch (item.getItemId()) {
-            case R.id.my_donations:
-                Intent donations = new Intent(this, MyDonations.class);
-                startActivity(donations);
-                break;
-            case R.id.about:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
-                break;
+            case android.R.id.home:
+                this.finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextSubmit(String query) {
         ImageAdapter imageAdapter = (ImageAdapter) gridView.getAdapter();
-        imageAdapter.getFilter().filter(query + ":cat:" + category);
+        imageAdapter.getFilter().filter(query + ":cat:" + StaticState.getCategory());
 
         return true;
     }
@@ -198,19 +198,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextChange(String newText) {
-
-
         ImageAdapter imageAdapter = (ImageAdapter) gridView.getAdapter();
-        imageAdapter.getFilter().filter(newText + ":cat:" + category);
-
-        // use to enable search view popup text
-//        if (TextUtils.isEmpty(newText)) {
-//            friendListView.clearTextFilter();
-//        }
-//        else {
-//            friendListView.setFilterText(newText.toString());
-//        }
-
+        imageAdapter.getFilter().filter(newText + ":cat:" + StaticState.getCategory());
         return true;
     }
 
@@ -222,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         if (!previouslyStarted) {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
-            edit.commit();
+            edit.apply();
         }
         return !previouslyStarted;
     }
@@ -262,6 +251,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 sendSms(charity, keyword);
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }
         });

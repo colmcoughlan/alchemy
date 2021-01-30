@@ -32,11 +32,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 .commit();
     }
 
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
     private void setupActionBar() {
-        Log.d("actionbar", "started");
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             // Show the Up button in the action bar.

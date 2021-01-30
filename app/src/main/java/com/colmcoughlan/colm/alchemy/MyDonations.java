@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.colmcoughlan.colm.alchemy.model.Donation;
 
@@ -41,6 +42,8 @@ public class MyDonations extends AppCompatActivity {
         final Observer<List<Donation>> observer = new Observer<List<Donation>>() {
             @Override
             public void onChanged(@Nullable final List<Donation> donations) {
+                TextView textView = findViewById(R.id.my_donations_total);
+                textView.setText('€' + String.valueOf(getTotal(donations)));
                 GridView gridView = findViewById(R.id.my_donations_gridview);
                 gridView.setAdapter(new DonationsAdapter(context, getMap(donations)));
             }
@@ -49,16 +52,19 @@ public class MyDonations extends AppCompatActivity {
         donationViewModel.getAllDonations().observe(this, observer);
     }
 
-    private Map<String, Integer> getMap(List<Donation> donations) {
-        Map<String, Integer> result = new HashMap<>();
+    private int getTotal(List<Donation> donations) {
         int totalDonations = 0;
         for (Donation donation : donations) {
-            int intValue = (int) donation.getTotalDonation();
-            totalDonations = totalDonations + intValue;
-            result.put(donation.getCharityName(), intValue);
+            totalDonations += (int) donation.getTotalDonation();
         }
+        return totalDonations;
+    }
 
-        result.put(getString(R.string.total_donations), totalDonations);
+    private Map<String, Integer> getMap(List<Donation> donations) {
+        Map<String, Integer> result = new HashMap<>();
+        for (Donation donation : donations) {
+            result.put(donation.getCharityName(), (int) donation.getTotalDonation());
+        }
 
         return result;
     }

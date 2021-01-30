@@ -15,8 +15,19 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(this, MainActivity.class);
+        // preload the charities
+        DataReader.executeAsync(getString(R.string.server_url), callback());
+        Intent intent = new Intent(this, CategoryActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private DataReader.Callback callback() {
+        return new DataReader.Callback() {
+            @Override
+            public void onComplete() {
+                // do nothing
+            }
+        };
     }
 }
