@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -19,13 +18,17 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.colmcoughlan.colm.alchemy.model.Callback;
+import com.colmcoughlan.colm.alchemy.model.Charity;
 import com.colmcoughlan.colm.alchemy.model.Donation;
+import com.colmcoughlan.colm.alchemy.service.CharityService;
+import com.colmcoughlan.colm.alchemy.service.HttpCharityService;
+import com.colmcoughlan.colm.alchemy.utils.DialogUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -44,17 +47,14 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CharityService charityService = new HttpCharityService(this);
         setContentView(R.layout.activity_charities);
         setupActionBar();
         this.donationViewModel = ViewModelProviders.of(this).get(DonationViewModel.class);
 
         // set up observer for donations
-        final Observer<List<Donation>> observer = new Observer<List<Donation>>() {
-            @Override
-            public void onChanged(@Nullable final List<Donation> updatedDonations) {
-                donations = updatedDonations;
-            }
-        };
+        final Observer<List<Donation>> observer =
+                updatedDonations -> donations = updatedDonations;
         donationViewModel.getAllDonations().observe(this, observer);
 
         // if this is the first run, display an information box
@@ -66,30 +66,22 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
         // create the gridview and get the data
 
         gridView = findViewById(R.id.gridview);
-        DataReader.executeAsync(getString(R.string.server_url), callback());
+        charityService.getCharities(callback());
 
         // set up click listener for selection of charities
         gridView.setOnItemClickListener(createOnClickListener());
         gridView.setOnItemLongClickListener(createOnLongClickListener());
     }
 
-    private DataReader.Callback callback(){
+    private Callback callback(){
         final Context context = this;
-        return new DataReader.Callback() {
-            @Override
-            public void onComplete() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        View progressBarGroup = findViewById(R.id.indeterminateBar);
-                        progressBarGroup.setVisibility(View.GONE);
-                        ImageAdapter imageAdapter = new ImageAdapter(context, StaticState.getCharities());
-                        imageAdapter.getFilter().filter("" + ":cat:" + StaticState.getCategory());
-                        gridView.setAdapter(imageAdapter);
-                    }
-                });
-            }
-        };
+        return () -> runOnUiThread(() -> {
+                View progressBarGroup = findViewById(R.id.indeterminateBar);
+                progressBarGroup.setVisibility(View.GONE);
+                ImageAdapter imageAdapter = new ImageAdapter(context, StaticState.getCharities());
+                imageAdapter.getFilter().filter("" + ":cat:" + StaticState.getCategory());
+                gridView.setAdapter(imageAdapter);
+            });
     }
 
     private void setupActionBar() {
@@ -101,36 +93,32 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
     }
 
     private OnItemClickListener createOnClickListener() {
-        return new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                final Charity charity = (Charity) gridView.getItemAtPosition(position);
-                final List<String> keywords = charity.getKeys();
-                final Map<String, String> freqs = charity.getFreqs();
+        return (parent, view, position, id) -> {
+            final Charity charity = (Charity) gridView.getItemAtPosition(position);
+            final Map<String, String> freqs = charity.getFrequencies();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(CharityActivity.this);
-                builder.setTitle("Choose a keyword.");
-                builder.setItems(charity.getKeywords(keywords), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        confirmDialog(charity, keywords.get(which), freqs.get(keywords.get(which)));
-                    }
-                });
-                builder.create().show();
-            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(CharityActivity.this);
+            builder.setTitle("Choose a keyword.");
+            List<String> keywords = charity.getKeywords();
+            Context context = this;
+            builder.setItems(charity.getDonationText(), (dialog, which) -> {
+                String keyword = keywords.get(which);
+                DialogUtils.INSTANCE.confirmDialog(context, charity,
+                        keyword, freqs.get(keyword),
+                        () -> sendSms(charity, keyword));
+                    });
+
+            builder.create().show();
         };
     }
 
     private AdapterView.OnItemLongClickListener createOnLongClickListener() {
-        return new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final Charity charity = (Charity) gridView.getItemAtPosition(position);
-                int duration = Toast.LENGTH_LONG;
-                Toast toast = Toast.makeText(getApplicationContext(), charity.getDescription(), duration);
-                toast.show();
-                return true; // cancel the single click with true
-            }
+        return (parent, view, position, id) -> {
+            final Charity charity = (Charity) gridView.getItemAtPosition(position);
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(getApplicationContext(), charity.getDescription(), duration);
+            toast.show();
+            return true; // cancel the single click with true
         };
     }
 
@@ -220,50 +208,9 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
 
     private void showHelp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Welcome!");
+        builder.setTitle(R.string.welcome_title);
         builder.setMessage(R.string.welcome_text);
-        builder.setPositiveButton(R.string.welcome_dismiss, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    // check with the user if they want to confirm a donation
-
-    private void confirmDialog(final Charity charity, final String keyword, final String freq) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String msg;
-        if (freq.equals("once")) {
-            msg = "Donate ";
-        } else if (freq.equals("week")) {
-            msg = "Set up a weekly donation of ";
-        } else if (freq.equals("month")) {
-            msg = "Set up a monthly donation of ";
-        } else {
-            msg = "ERROR! Please report this and try a different donation option.";
-        }
-
-        builder.setTitle(msg + charity.getCost(keyword) + " to " + charity.getName() + "?");
-        builder.setMessage(getString(R.string.likecharity_tcs));
-        builder.setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                sendSms(charity, keyword);
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
+        builder.setPositiveButton(R.string.welcome_dismiss, (dialog, id) -> dialog.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -294,6 +241,7 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             switch (resultCode) {
                 case Activity.RESULT_OK:

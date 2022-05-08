@@ -6,13 +6,13 @@ import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.colmcoughlan.colm.alchemy.adapters.DonationsAdapter;
 import com.colmcoughlan.colm.alchemy.model.Donation;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -39,14 +39,11 @@ public class MyDonations extends AppCompatActivity {
         setContentView(R.layout.activity_my_donations);
         setupActionBar();
 
-        final Observer<List<Donation>> observer = new Observer<List<Donation>>() {
-            @Override
-            public void onChanged(@Nullable final List<Donation> donations) {
-                TextView textView = findViewById(R.id.my_donations_total);
-                textView.setText('€' + String.valueOf(getTotal(donations)));
-                GridView gridView = findViewById(R.id.my_donations_gridview);
-                gridView.setAdapter(new DonationsAdapter(context, getMap(donations)));
-            }
+        final Observer<List<Donation>> observer = donations -> {
+            TextView textView = findViewById(R.id.my_donations_total);
+            textView.setText(String.format("€%s", getTotal(donations)));
+            GridView gridView = findViewById(R.id.my_donations_gridview);
+            gridView.setAdapter(new DonationsAdapter(context, getMap(donations)));
         };
 
         donationViewModel.getAllDonations().observe(this, observer);

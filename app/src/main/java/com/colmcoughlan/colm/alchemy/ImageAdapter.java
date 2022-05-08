@@ -10,6 +10,7 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.colmcoughlan.colm.alchemy.model.Charity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class ImageAdapter extends BaseAdapter {
         }
 
         holder.textView.setText(filteredList.get(position).getName());
-        String logo_url = filteredList.get(position).getLogoURL();
+        String logo_url = filteredList.get(position).getLogo_url();
         try {
             Picasso.get().load(logo_url).placeholder(R.drawable.alchemy).into(holder.imageView);
         } catch (Throwable e) {
@@ -107,7 +108,7 @@ public class ImageAdapter extends BaseAdapter {
                 haveConstraint = true;
             }
             if (haveConstraint || !category.equals("All")) {
-                ArrayList<Charity> tempList = new ArrayList<Charity>();
+                ArrayList<Charity> tempList = new ArrayList<>();
 
                 for (Charity charity : charityList) {
                     if (haveConstraint) {

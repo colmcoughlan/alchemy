@@ -17,6 +17,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".SplashActivity"
+            android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,6 +26,7 @@
         </activity>
         <activity
             android:name=".MyDonations"
+            android:exported="true"
             android:label="@string/title_activity_my_donations">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -32,6 +34,7 @@
         </activity>
         <activity
             android:name=".CategoryActivity"
+            android:exported="true"
             android:label="@string/title_activity_category">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

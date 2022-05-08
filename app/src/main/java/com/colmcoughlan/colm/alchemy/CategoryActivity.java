@@ -2,7 +2,6 @@ package com.colmcoughlan.colm.alchemy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -75,7 +73,7 @@ public class CategoryActivity extends AppCompatActivity {
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.cardView = (CardView) itemView.findViewById(R.id.card_view);
+            this.cardView = itemView.findViewById(R.id.card_view);
             this.textView = cardView.findViewById(R.id.card_view_text);
         }
     }
@@ -108,14 +106,11 @@ public class CategoryActivity extends AppCompatActivity {
         public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.category_card_item, parent, false);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int itemPosition = mRecyclerView.getChildLayoutPosition(v);
-                    StaticState.setCurrentCategory(categories.get(itemPosition));
-                    Intent intent = new Intent(mContext, CharityActivity.class);
-                    startActivity(intent);
-                }
+            view.setOnClickListener(v -> {
+                int itemPosition = mRecyclerView.getChildLayoutPosition(v);
+                StaticState.setCurrentCategory(categories.get(itemPosition));
+                Intent intent = new Intent(mContext, CharityActivity.class);
+                startActivity(intent);
             });
             return new CategoryViewHolder(view);
         }

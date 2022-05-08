@@ -15,10 +15,10 @@ import androidx.room.Room;
  */
 
 public class DonationRepository {
-    private DonationDao donationDao;
+    private final DonationDao donationDao;
     private static final String DB_NAME = "db_donation";
 
-    private LiveData<List<Donation>> allDonations;
+    private final LiveData<List<Donation>> allDonations;
 
     public DonationRepository(Context context) {
         DonationDatabase db = Room.databaseBuilder(context, DonationDatabase.class, DB_NAME).build();
@@ -34,32 +34,13 @@ public class DonationRepository {
         new insertAsyncDonation(donationDao).execute(donation);
     }
 
-    public void insertAll(List<Donation> donations) {
-        new insertAsyncDonations(donationDao).execute(donations);
-    }
-
     public void updateDonation(Donation donation) {
         new updateAsyncDonation(donationDao).execute(donation);
     }
 
-    private static class insertAsyncDonations extends AsyncTask<List<Donation>, Void, Void> {
-
-        private DonationDao mAsyncDonationDao;
-
-        insertAsyncDonations(DonationDao dao) {
-            mAsyncDonationDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final List<Donation>... params) {
-            mAsyncDonationDao.insertAll(params[0]);
-            return null;
-        }
-    }
-
     private static class insertAsyncDonation extends AsyncTask<Donation, Void, Void> {
 
-        private DonationDao mAsyncDonationDao;
+        private final DonationDao mAsyncDonationDao;
 
         insertAsyncDonation(DonationDao dao) {
             mAsyncDonationDao = dao;
@@ -74,7 +55,7 @@ public class DonationRepository {
 
     private static class updateAsyncDonation extends AsyncTask<Donation, Void, Void> {
 
-        private DonationDao mAsyncDonationDao;
+        private final DonationDao mAsyncDonationDao;
 
         updateAsyncDonation(DonationDao dao) {
             mAsyncDonationDao = dao;

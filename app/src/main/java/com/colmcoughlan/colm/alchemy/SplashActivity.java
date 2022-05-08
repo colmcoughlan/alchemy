@@ -3,6 +3,9 @@ package com.colmcoughlan.colm.alchemy;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.colmcoughlan.colm.alchemy.service.CharityService;
+import com.colmcoughlan.colm.alchemy.service.HttpCharityService;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
@@ -16,18 +19,10 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // preload the charities
-        DataReader.executeAsync(getString(R.string.server_url), callback());
+        CharityService repository = new HttpCharityService(this);
+        repository.getCharities(() -> {});
         Intent intent = new Intent(this, CategoryActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    private DataReader.Callback callback() {
-        return new DataReader.Callback() {
-            @Override
-            public void onComplete() {
-                // do nothing
-            }
-        };
     }
 }

@@ -1,9 +1,11 @@
 package com.colmcoughlan.colm.alchemy;
 
 import android.app.Application;
+import android.os.Bundle;
 
 import com.colmcoughlan.colm.alchemy.model.Donation;
 import com.colmcoughlan.colm.alchemy.repository.DonationRepository;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
@@ -17,10 +19,12 @@ import androidx.lifecycle.LiveData;
 
 public class DonationViewModel extends AndroidViewModel {
     private final DonationRepository donationRepository;
+    private final FirebaseAnalytics mFirebaseAnalytics;
 
     public DonationViewModel(@NonNull Application application) {
         super(application);
         this.donationRepository = new DonationRepository(application);
+        this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(application);
     }
 
     public LiveData<List<Donation>> getAllDonations() {
@@ -57,5 +61,13 @@ public class DonationViewModel extends AndroidViewModel {
         if (insert) {
             insertNewDonation(charity, value);
         }
+        recordForAnalytics(charity, value);
+    }
+
+    public void recordForAnalytics(final String charity, final double value) {
+        Bundle bundle = new Bundle();
+        bundle.putString("charity", charity);
+        bundle.putDouble("value", value);
+        mFirebaseAnalytics.logEvent("DONATION", new Bundle());
     }
 }
