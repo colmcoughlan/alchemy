@@ -73,15 +73,15 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
         gridView.setOnItemLongClickListener(createOnLongClickListener());
     }
 
-    private Callback callback(){
+    private Callback callback() {
         final Context context = this;
         return () -> runOnUiThread(() -> {
-                View progressBarGroup = findViewById(R.id.indeterminateBar);
-                progressBarGroup.setVisibility(View.GONE);
-                ImageAdapter imageAdapter = new ImageAdapter(context, StaticState.getCharities());
-                imageAdapter.getFilter().filter("" + ":cat:" + StaticState.getCategory());
-                gridView.setAdapter(imageAdapter);
-            });
+            View progressBarGroup = findViewById(R.id.indeterminateBar);
+            progressBarGroup.setVisibility(View.GONE);
+            ImageAdapter imageAdapter = new ImageAdapter(context, StaticState.getCharities());
+            imageAdapter.getFilter().filter("" + ":cat:" + StaticState.getCategory());
+            gridView.setAdapter(imageAdapter);
+        });
     }
 
     private void setupActionBar() {
@@ -106,7 +106,7 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
                 DialogUtils.INSTANCE.confirmDialog(context, charity,
                         keyword, freqs.get(keyword),
                         () -> sendSms(charity, keyword));
-                    });
+            });
 
             builder.create().show();
         };

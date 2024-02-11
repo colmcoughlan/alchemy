@@ -13,7 +13,7 @@ class DonationsAdapter(
     private val donations: Map<String, Int>
 ) : BaseAdapter() {
 
-    private val charities = donations.entries.sortedBy { (_, v) -> v }.map { (k,_) -> k }
+    private val charities = donations.entries.sortedBy { (_, v) -> v }.map { (k, _) -> k }
 
     override fun getCount(): Int {
         return donations.size
@@ -44,7 +44,7 @@ class DonationsAdapter(
         }
     }
 
-    private fun setTextView(position: Int, textView: TextView){
+    private fun setTextView(position: Int, textView: TextView) {
         val charityName = charities[position]
         textView.text = String.format("%s: €%s", charityName, donations[charityName])
     }

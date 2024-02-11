@@ -2,7 +2,6 @@ package com.colmcoughlan.colm.alchemy;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
@@ -12,10 +11,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

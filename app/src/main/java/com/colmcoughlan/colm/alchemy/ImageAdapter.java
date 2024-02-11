@@ -21,8 +21,8 @@ import java.util.List;
  */
 
 public class ImageAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<Charity> charityList;
+    private final Context mContext;
+    private final List<Charity> charityList;
     private List<Charity> filteredList;
     private CharityFilter charityFilter;
 

@@ -8,8 +8,10 @@ import com.colmcoughlan.colm.alchemy.model.Charity
 
 object DialogUtils {
     // check with the user if they want to confirm a donation
-    fun confirmDialog(context: Context, charity: Charity, keyword: String, freq: String,
-    successCallback: Callback) {
+    fun confirmDialog(
+        context: Context, charity: Charity, keyword: String, freq: String,
+        successCallback: Callback
+    ) {
         val builder = AlertDialog.Builder(context)
         val msg: String = when (freq) {
             "once" -> "Donate "

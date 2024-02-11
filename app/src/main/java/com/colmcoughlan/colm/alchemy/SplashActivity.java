@@ -20,7 +20,8 @@ public class SplashActivity extends AppCompatActivity {
 
         // preload the charities
         CharityService repository = new HttpCharityService(this);
-        repository.getCharities(() -> {});
+        repository.getCharities(() -> {
+        });
         Intent intent = new Intent(this, CategoryActivity.class);
         startActivity(intent);
         finish();

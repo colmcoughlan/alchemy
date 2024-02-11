@@ -97,7 +97,7 @@ public class CategoryActivity extends AppCompatActivity {
                     Color.parseColor("#2CF6B3"),
                     Color.parseColor("#D282A6"),
                     Color.parseColor("#258EA6")
-                    );
+            );
         }
 
         @NonNull
