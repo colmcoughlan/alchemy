@@ -36,3 +36,5 @@
 }
 -keepnames class com.fasterxml.jackson.** { *; }
 -dontwarn com.fasterxml.jackson.databind.**
+-keepattributes Signature
+-keep class * extends com.fasterxml.jackson.core.type.TypeReference {*;}

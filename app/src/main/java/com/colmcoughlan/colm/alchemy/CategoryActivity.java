@@ -108,7 +108,7 @@ public class CategoryActivity extends AppCompatActivity {
                     .inflate(R.layout.category_card_item, parent, false);
             view.setOnClickListener(v -> {
                 int itemPosition = mRecyclerView.getChildLayoutPosition(v);
-                StaticState.setCurrentCategory(categories.get(itemPosition));
+                StaticState.setCategory(categories.get(itemPosition));
                 Intent intent = new Intent(mContext, CharityActivity.class);
                 startActivity(intent);
             });

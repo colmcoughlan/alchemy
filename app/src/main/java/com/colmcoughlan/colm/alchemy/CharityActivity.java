@@ -177,7 +177,9 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
     @Override
     public boolean onQueryTextSubmit(String query) {
         ImageAdapter imageAdapter = (ImageAdapter) gridView.getAdapter();
-        imageAdapter.getFilter().filter(query + ":cat:" + StaticState.getCategory());
+        if (imageAdapter != null) {
+            imageAdapter.getFilter().filter(query + ":cat:" + StaticState.getCategory());
+        }
 
         return true;
     }
@@ -187,7 +189,9 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
     @Override
     public boolean onQueryTextChange(String newText) {
         ImageAdapter imageAdapter = (ImageAdapter) gridView.getAdapter();
-        imageAdapter.getFilter().filter(newText + ":cat:" + StaticState.getCategory());
+        if (imageAdapter != null) {
+            imageAdapter.getFilter().filter(newText + ":cat:" + StaticState.getCategory());
+        }
         return true;
     }
 
@@ -226,7 +230,7 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
         intent.putExtra("sms_body", keyword);
         intent.putExtra("exit_on_sent", true);
         if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, 1);
+            startActivity(intent);
             donationViewModel.recordDonation(this.donations, charity.getName(), smsKeywordToDonation(charity.getCost(keyword)));
         } else {
             Toast.makeText(this, "No SMS provider found", Toast.LENGTH_SHORT).show();
