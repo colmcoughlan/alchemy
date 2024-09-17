@@ -19,6 +19,13 @@
         android:selectable="false"
         android:ellipsize="none"
         android:scrollHorizontally="false"
+        android:title="AI Use"
+        android:summary="@string/genai"/>
+    <Preference
+        android:key="pref_static_field_key"
+        android:selectable="false"
+        android:ellipsize="none"
+        android:scrollHorizontally="false"
         android:title="LIKECHARITY Information"
         android:summary="@string/likecharity_tcs"/>
     <ListPreference

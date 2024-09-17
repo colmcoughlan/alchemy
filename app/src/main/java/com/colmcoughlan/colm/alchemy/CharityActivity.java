@@ -9,13 +9,17 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.colmcoughlan.colm.alchemy.model.Callback;
@@ -53,8 +57,7 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
         this.donationViewModel = ViewModelProviders.of(this).get(DonationViewModel.class);
 
         // set up observer for donations
-        final Observer<List<Donation>> observer =
-                updatedDonations -> donations = updatedDonations;
+        final Observer<List<Donation>> observer = updatedDonations -> donations = updatedDonations;
         donationViewModel.getAllDonations().observe(this, observer);
 
         // if this is the first run, display an information box
@@ -70,7 +73,6 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
 
         // set up click listener for selection of charities
         gridView.setOnItemClickListener(createOnClickListener());
-        gridView.setOnItemLongClickListener(createOnLongClickListener());
     }
 
     private Callback callback() {
@@ -98,7 +100,7 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
             final Map<String, String> freqs = charity.getFrequencies();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(CharityActivity.this);
-            builder.setTitle("Choose a keyword.");
+            builder.setTitle(String.format("%s\nChoose a donation option", charity.getName()));
             List<String> keywords = charity.getKeywords();
             Context context = this;
             builder.setItems(charity.getDonationText(), (dialog, which) -> {
@@ -108,17 +110,31 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
                         () -> sendSms(charity, keyword));
             });
 
-            builder.create().show();
-        };
-    }
+//
+//            AlertDialog.Builder builder = new AlertDialog.Builder(CharityActivity.this);
+//            LayoutInflater inflater = getLayoutInflater();
+//            View dialogView = inflater.inflate(R.layout.charity_summary_and_donation_options, null);
+//            builder.setView(dialogView);
+//            builder.setTitle(charity.getName());
+//
+//            // Reference to the TextView for the message
+//            TextView messageTextView = dialogView.findViewById(R.id.dialog_message);
+//            messageTextView.setText(charity.getDescription());
+//
+//            // Reference to the ListView for the items
+//            ListView listView = dialogView.findViewById(R.id.list_view);
+//
+//            // Set up the adapter for the ListView
+//            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, charity.getDonationText());
+//            listView.setAdapter(adapter);
+//
+//            // Handle item clicks
+//            listView.setOnItemClickListener((parent1, view1, position1, id1) -> {
+//                String keyword = charity.getKeywords().get(position1);
+//                DialogUtils.INSTANCE.confirmDialog(this, charity, keyword, freqs.get(keyword), () -> sendSms(charity, keyword));
+//            });
 
-    private AdapterView.OnItemLongClickListener createOnLongClickListener() {
-        return (parent, view, position, id) -> {
-            final Charity charity = (Charity) gridView.getItemAtPosition(position);
-            int duration = Toast.LENGTH_LONG;
-            Toast toast = Toast.makeText(getApplicationContext(), charity.getDescription(), duration);
-            toast.show();
-            return true; // cancel the single click with true
+            builder.create().show();
         };
     }
 
@@ -134,13 +150,11 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.charity_menu, menu);
 
-        SearchManager searchManager = (SearchManager)
-                getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchMenuItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) searchMenuItem.getActionView();
 
-        searchView.setSearchableInfo(searchManager.
-                getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         searchView.setSubmitButtonEnabled(true);
         searchView.setOnQueryTextListener(this);

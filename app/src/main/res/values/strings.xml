@@ -37,7 +37,7 @@
     <string name="welcome_text">
         Welcome to Alchemy, an app which will help you discover and donate to charities in Ireland.
         \n\nTap a charity to see the donation options, and tap again to make a donation via text using your phone credit. Alchemy will prepare the text with the correct number and keyword - but you have to hit send to actually make the donation. You will get a message from the donation handling company confirming your donation was successful.
-        \n\nYou can long press on a charity to find see information on it.
+        \n\nAn AI generated summary of each charity is presented to help you learn about them. You can also visit their websites to learn more!.
     </string>
     <string name="welcome_dismiss">Ok</string>
 
@@ -50,6 +50,9 @@
     <string name="disclaimer">Donations made through this app come out of your phone credit or bill.
         \n\nAlchemy does not handle any of your money - it is sent straight to the listed donation number for the charity.
         \n\nAlchemy has no association with any of the charities, donation service providers or phone networks that handle your donation.
+    </string>
+
+    <string name="genai">Charity summaries are AI generated and may be inaccurate. Please contact alchemy@colmcoughlan.com to report any issues.
     </string>
 
     <string name="supported_countries_title">Country</string>

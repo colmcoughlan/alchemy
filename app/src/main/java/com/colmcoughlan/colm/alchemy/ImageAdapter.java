@@ -26,8 +26,9 @@ public class ImageAdapter extends BaseAdapter {
     private List<Charity> filteredList;
     private CharityFilter charityFilter;
 
-    static class ViewHolder {
-        TextView textView;
+    private static class ViewHolder {
+        TextView nameView;
+        TextView summaryView;
         ImageView imageView;
     }
 
@@ -58,8 +59,9 @@ public class ImageAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.gridview_layout, null);
             holder = new ViewHolder();
-            holder.textView = (TextView) convertView.findViewById(R.id.gridview_text);
-            holder.imageView = (ImageView) convertView.findViewById(R.id.gridview_image);
+            holder.nameView = convertView.findViewById(R.id.gridview_name);
+            holder.summaryView = convertView.findViewById(R.id.gridview_summary);
+            holder.imageView = convertView.findViewById(R.id.gridview_image);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -72,7 +74,8 @@ public class ImageAdapter extends BaseAdapter {
             convertView.setBackgroundColor(Color.parseColor("#eeeeee"));
         }
 
-        holder.textView.setText(filteredList.get(position).getName());
+        holder.nameView.setText(filteredList.get(position).getName());
+        holder.summaryView.setText(filteredList.get(position).getDescription());
         String logo_url = filteredList.get(position).getLogo_url();
         try {
             Picasso.get().load(logo_url).placeholder(R.drawable.alchemy).into(holder.imageView);

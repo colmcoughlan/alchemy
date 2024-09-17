@@ -13,12 +13,23 @@
         android:layout_weight="0.9"/>
 
     <TextView
-        android:id="@+id/gridview_text"
+        android:id="@+id/gridview_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
         android:textSize="24sp"
+        android:textColor="#263238"
+        android:gravity="center"
+        android:layout_weight="0.1"/>
+
+    <TextView
+        android:id="@+id/gridview_summary"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:textSize="12sp"
         android:textColor="#263238"
         android:gravity="center"
         android:layout_weight="0.1"/>

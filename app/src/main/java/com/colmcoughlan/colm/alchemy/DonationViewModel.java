@@ -68,6 +68,6 @@ public class DonationViewModel extends AndroidViewModel {
         Bundle bundle = new Bundle();
         bundle.putString("charity", charity);
         bundle.putDouble("value", value);
-        mFirebaseAnalytics.logEvent("DONATION", new Bundle());
+        mFirebaseAnalytics.logEvent("DONATION", bundle);
     }
 }

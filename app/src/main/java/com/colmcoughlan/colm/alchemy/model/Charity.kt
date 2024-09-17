@@ -12,7 +12,7 @@ data class Charity(
     val freq: String = "",
     val frequencies: Map<String, String> = emptyMap()
 ) {
-    fun getDonationText(): Array<CharSequence> {
+    fun getDonationText(): Array<String> {
         return (donationOptions.keys).associateWith { k ->
             String.format("%s : %s - %s", getFrequencyText(frequencies[k]), k, donationOptions[k])
         }
