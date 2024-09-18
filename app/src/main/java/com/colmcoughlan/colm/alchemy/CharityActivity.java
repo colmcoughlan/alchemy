@@ -110,30 +110,6 @@ public class CharityActivity extends AppCompatActivity implements SearchView.OnQ
                         () -> sendSms(charity, keyword));
             });
 
-//
-//            AlertDialog.Builder builder = new AlertDialog.Builder(CharityActivity.this);
-//            LayoutInflater inflater = getLayoutInflater();
-//            View dialogView = inflater.inflate(R.layout.charity_summary_and_donation_options, null);
-//            builder.setView(dialogView);
-//            builder.setTitle(charity.getName());
-//
-//            // Reference to the TextView for the message
-//            TextView messageTextView = dialogView.findViewById(R.id.dialog_message);
-//            messageTextView.setText(charity.getDescription());
-//
-//            // Reference to the ListView for the items
-//            ListView listView = dialogView.findViewById(R.id.list_view);
-//
-//            // Set up the adapter for the ListView
-//            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, charity.getDonationText());
-//            listView.setAdapter(adapter);
-//
-//            // Handle item clicks
-//            listView.setOnItemClickListener((parent1, view1, position1, id1) -> {
-//                String keyword = charity.getKeywords().get(position1);
-//                DialogUtils.INSTANCE.confirmDialog(this, charity, keyword, freqs.get(keyword), () -> sendSms(charity, keyword));
-//            });
-
             builder.create().show();
         };
     }
